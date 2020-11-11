@@ -1,5 +1,5 @@
 export default {
-  input: 'src/main.js',
+  input: 'index.js',
   output: {
     file: 'dist/bundle.umd.js',
     format: 'umd',

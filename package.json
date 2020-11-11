@@ -2,7 +2,7 @@
   "name": "hux-js",
   "version": "1.0.0",
   "description": "Hyper-fast data manipulation in the browser",
-  "main": "dist/bundle.umd.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "rollup -c",
@@ -23,7 +23,7 @@
   "keywords": [
     "workers",
     "data",
-    "manipulation",
-    "api"
+    "api",
+    "hux"
   ]
 }

@@ -21,9 +21,9 @@
     "url": "git+https://github.com/trunham/hux-js.git"
   },
   "keywords": [
-    "npm",
-    "node",
-    "masks",
-    "javascript"
+    "workers",
+    "data",
+    "manipulation",
+    "api"
   ]
 }

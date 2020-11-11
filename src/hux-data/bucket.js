@@ -1,3 +1,0 @@
-const bucket = () => {};
-
-export { bucket };

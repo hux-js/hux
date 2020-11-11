@@ -1,3 +1,3 @@
-import { workers } from './worker';
+import { createWorker } from './worker.interface';
 
-export { workers };
+export { createWorker, interOp };

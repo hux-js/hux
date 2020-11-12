@@ -1,3 +1,3 @@
-import { request } from './request';
+import { hydrate } from './hydrate.interface';
 
-export { request };
+export { hydrate };

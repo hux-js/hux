@@ -1,26 +1,52 @@
 import { v4 as uuidv4 } from 'uuid';
+import { graphql, buildSchema } from 'graphql';
 
-const buckets = {};
+import { optimiseData } from './utils/optimiseData';
+import { aggregateData } from './utils/aggregateData';
 
-const bucket = () => {
-  // receive data
+let buckets = {}; // Should this be in IDB?
 
-  // optimise data
+const createBucket = async ({
+  data,
+  name,
+  userSchema,
+  query,
+}) => {
+  const bucketId = uuidv4();
+  const schema = userSchema
+    ? userSchema
+    : buildSchema(`
+      type Query {
+        id: String
+        email: String
+        messageCount: String
+      }
+    `);
 
-  // perform dimensional mapping
+  const optimisedData = await optimiseData({ data });
+  const aggregatedData = aggregateData({ data: optimisedData });
 
-  // cache data
+  const bucket = {
+    [name || bucketId]: {
+      schema,
+      data: aggregatedData,
+    },
+  };
 
-  // return data
-};
-
-const createBucket = ({ data }) => {
   buckets = {
     ...buckets,
-    [uuidv4()]: data,
+    ...bucket,
   };
+
+  return query ? queryBucket({ name, query }) : aggregatedData;
 };
 
-const getBucket = ({ id }) => bucket[id];
+const queryBucket = async ({ name, query }) => {
+  const bucket = buckets[name];
 
-export { bucket, createBucket, getBucket };
+  const { data } = await graphql(bucket.schema, query, bucket.data);
+
+  return data;
+};
+
+export { createBucket, queryBucket };

@@ -6,19 +6,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "rollup -c",
-    "minify": "uglifyjs dist/bundle.umd.js --screw-ie8 --compress --mangle --comments --output dist/bundle.umd.min.js",
+    "package-watch": "rollup -c --watch",
+    "minify": "uglifyjs dist/bundle.umd.js --compress --mangle --comments --output dist/bundle.umd.min.js",
     "build": "npm run package && npm run minify"
   },
   "devDependencies": {
     "rollup": "^2.33.1",
     "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
     "uglify-js": "^3.11.5"
   },
   "author": "Todd Runham",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trunham/hux-js.git"
+    "url": "git+https://github.com/hux-js/hux.git"
   },
   "keywords": [
     "workers",
@@ -27,6 +29,8 @@
     "hux"
   ],
   "dependencies": {
+    "comlink": "^4.3.0",
+    "graphql": "^15.4.0",
     "uuid": "^8.3.1"
   }
 }

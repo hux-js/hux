@@ -1,3 +1,0 @@
-const request = () => {};
-
-export { request };

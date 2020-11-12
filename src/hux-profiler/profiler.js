@@ -1,3 +1,0 @@
-const profiler = () => {};
-
-export { profiler };

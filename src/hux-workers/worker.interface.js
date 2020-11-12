@@ -1,17 +1,14 @@
-import { getBucket } from '../hux-data/buckets.interface'
+import * as Comlink from 'comlink';
 
-const createWorker = () => {
-  const worker = new Worker("worker.js");
+import workerString from '../../dist/worker.bundle.umd';
 
-  return worker;
+const createWorker = async () => {
+  const workerBlob = new Blob([workerString]);
+  const workerUrl = URL.createObjectURL(workerBlob);
+  const worker = new Worker(workerUrl);
+  const proxy = Comlink.wrap(worker);
+
+  return proxy;
 };
 
-const interOp = ({ task, bucketId, worker }) => {
-  const bucket = getBucket({ bucketId });
-
-  const response = worker.postMessage(bucket, task);
-
-  return response;
-};
-
-export { createWorker, interOp };
+export { createWorker };

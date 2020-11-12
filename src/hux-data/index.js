@@ -1,3 +1,3 @@
-import { bucket } from './buckets.interface';
+import { createBucket, queryBucket } from './buckets.interface';
 
-export { bucket };
+export { createBucket, queryBucket };

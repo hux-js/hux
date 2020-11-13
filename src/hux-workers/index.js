@@ -1,3 +1,3 @@
-import { createWorker } from './worker.interface';
+import { createWorker, WorkerEvent } from "./interface/worker";
 
-export { createWorker };
+export { createWorker, WorkerEvent };

@@ -1,3 +1,3 @@
-import { hydrate } from './hydrate.interface';
+import { hydrate, sync } from "./interface/api";
 
-export { hydrate };
+export { hydrate, sync };

@@ -1,3 +1,3 @@
-import { profiler, measureQueryPerformance } from './profiler.interface';
+import { measurePerformance } from "./interface/profiler";
 
-export { profiler, measureQueryPerformance };
+export { measurePerformance };

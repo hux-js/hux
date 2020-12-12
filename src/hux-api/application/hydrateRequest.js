@@ -1,5 +1,27 @@
 import { createWorker, WorkerEvent } from "../../hux-workers";
-import { triggerListeners, query as queryBucket } from "../../hux-store";
+import {
+  triggerListeners,
+  query as queryBucket,
+  listenToBucket,
+} from "../../hux-store";
+
+const hydrateServerRequest = async ({ request, query }) => {
+  const worker = await createWorker();
+
+  await worker.dispatcher(JSON.stringify(request));
+
+  const queryResponse = await queryBucket({
+    name: request.name,
+    query: query || [],
+  });
+
+  const response = {
+    result: queryResponse,
+    metrics: { details: { dataFrom: "Server" } },
+  };
+
+  return response;
+};
 
 const hydrateRequest = async ({
   url,
@@ -12,13 +34,12 @@ const hydrateRequest = async ({
   onUpdate,
 }) => {
   let response;
-  const worker = await createWorker();
 
   const stringifiedAggregations = aggregations.map((aggregation) =>
     aggregation.toString()
   );
 
-  const request = JSON.stringify({
+  const request = {
     eventType: WorkerEvent.HYDRATE,
     url,
     options,
@@ -26,13 +47,12 @@ const hydrateRequest = async ({
     schema,
     name,
     hasKey,
-  });
+  };
 
   if (query) {
     const cachedQueryResponse = await queryBucket({
       name,
       query,
-      onUpdate,
     });
 
     if (cachedQueryResponse) {
@@ -41,28 +61,32 @@ const hydrateRequest = async ({
         metrics: { details: { dataFrom: "Cache" } },
       };
 
+      // Set up async revalidation so we can return cached response early
       (async () => {
-        const revalidatedResponse = JSON.parse(
-          await worker.dispatcher(request)
-        );
+        const queryResponse = await hydrateServerRequest({
+          request,
+          query,
+        });
 
-        triggerListeners({ name, data: revalidatedResponse });
+        triggerListeners({ name, data: queryResponse.result });
       })();
     } else {
-      await worker.dispatcher(request);
-
-      const syncQueryResponse = await queryBucket({ name, query, onUpdate });
-
-      response = {
-        result: syncQueryResponse,
-        metrics: { details: { dataFrom: "Server" } },
-      };
+      response = await hydrateServerRequest({
+        request,
+        query,
+      });
     }
   } else {
-    response = JSON.parse(await worker.dispatcher(request));
+    response = await hydrateServerRequest({ request });
   }
 
-  triggerListeners({ name, data: response });
+  triggerListeners({ name, data: response.result });
+
+  // Set onUpdate after triggerListeners
+  // so we don't duplicate the data response
+  if (onUpdate && query) {
+    listenToBucket({ name, onUpdate, query });
+  }
 
   return response;
 };

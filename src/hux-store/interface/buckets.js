@@ -9,17 +9,12 @@ import { getBucketsMemorySizeRequest } from "../application/getBucketsMemorySize
 import { initialiseBucketCommand } from "../application/initialiseBucketCommand";
 import { generateError, errors } from "../../utils/errors";
 
-const queryBucket = async ({
-  name,
-  query,
-  onUpdate,
-  fromProfiler,
-}) => {
+const queryBucket = async ({ name, query, onUpdate, fromProfiler }) => {
   if (!name || !query) {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: 'name or query', action: "Query" },
+        details: { param: "name or query", action: "Query" },
       })
     );
 
@@ -57,7 +52,7 @@ const listenToBucket = async ({ name, onUpdate, query }) => {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: 'name or onUpdate', action: "listen" },
+        details: { param: "name or onUpdate", action: "listen" },
       })
     );
 
@@ -86,7 +81,7 @@ const Bucket = ({ hydrate, sync, schema, name }) => {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: 'name, schema or hydrate', action: "Bucket" },
+        details: { param: "name, schema or hydrate", action: "Bucket" },
       })
     );
 

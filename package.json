@@ -4,7 +4,7 @@
   "description": "Hyperfast data management to enable next-gen UX",
   "main": "dist/bundle.umd.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "package": "rollup -c",
     "package-watch": "rollup -c --watch",
     "minify": "uglifyjs dist/bundle.umd.js --compress --mangle --comments --output dist/bundle.umd.min.js",

@@ -1,5 +1,5 @@
 import { createWorker, WorkerEvent } from "../../hux-workers";
-import { listenToBucket } from '../';
+import { listenToBucket } from "../";
 
 const queryRequest = async ({ name, query, onUpdate }) => {
   const worker = await createWorker();

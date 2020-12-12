@@ -11,7 +11,7 @@ const hydrate = async ({ name, query, aggregations = [], onUpdate }) => {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: 'name', action: "hydrate" },
+        details: { param: "name", action: "hydrate" },
       })
     );
 
@@ -46,7 +46,7 @@ const hydrate = async ({ name, query, aggregations = [], onUpdate }) => {
     response = await hydrateRequest(params);
   }
 
-  return response;
+  return query ? response : null;
 };
 
 const sync = async ({ name, mode, data, fromProfiler }) => {
@@ -54,7 +54,7 @@ const sync = async ({ name, mode, data, fromProfiler }) => {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: 'name', action: "sync" },
+        details: { param: "name", action: "sync" },
       })
     );
 

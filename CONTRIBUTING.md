@@ -2,9 +2,8 @@
 
 Any contributions are extremely welcome and appreciated. However, before doing so we do ask that you read the following.
 
-- [Code of Conduct](https://github.com/hux-js/hux/CODE_OF_CONDUCT.md)
+- [Code of Conduct](https://github.com/hux-js/hux/blob/develop/CODE_OF_CONDUCT.md)
 - [Contributing](#contributing)
-- [Development Setup](#development-setup)
 - [Repository Architecture](#repository-architecture)
 
 ## Contributing

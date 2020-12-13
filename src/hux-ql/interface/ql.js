@@ -13,7 +13,7 @@ const Filter = (id, filter, page, limit) => {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: 'id or filter', action: "Filter" },
+        details: { param: "id or filter", action: "Filter" },
       })
     );
 

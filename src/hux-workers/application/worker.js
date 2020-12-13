@@ -30,14 +30,14 @@ const memorySizeOf = (obj) => {
       }
     }
     return bytes;
-  }
+  };
 
   const formatByteSize = (bytes) => {
     return (bytes / 1024).toFixed(3);
-  }
+  };
 
   return formatByteSize(sizeOf(obj));
-}
+};
 
 const CORE_DB = "hux";
 
@@ -144,10 +144,7 @@ const initialiseBucket = async ({ name, schema, hasKey }) => {
   if (!buckets[name] || !buckets[name].data) {
     const cachedData = await fetchFromCache({ name });
 
-    const found =
-      cachedData === "Not found"
-        ? {}
-        : cachedData.bucket;
+    const found = cachedData === "Not found" ? {} : cachedData.bucket;
 
     buckets[name] = {
       schema,
@@ -213,7 +210,8 @@ const optimise = ({ data, schema, hasKey }) => {
         const key = schemaKeys[i];
         const isProperty = key === "properties";
         const value = subSchema.key ? subSchema : subSchema[key];
-        const currentSubData = isProperty || subSchema.key ? subData : subData[key];
+        const currentSubData =
+          isProperty || subSchema.key ? subData : subData[key];
 
         if (value.key && !keyFound) {
           indexes[incrementer] = {};
@@ -287,7 +285,10 @@ const query = async ({ query, name }) => {
         let filteredData;
 
         // Check if an index exists on exact match only
-        if (checkIndexExists({ schema: subSchema, key }) && key.filter === "=") {
+        if (
+          checkIndexExists({ schema: subSchema, key }) &&
+          key.filter === "="
+        ) {
           if (key.id) {
             const cachedIndex = indexes[subSchema[key.id].index];
             filteredData = [queryData[key.id][cachedIndex[key.value]]];
@@ -299,17 +300,26 @@ const query = async ({ query, name }) => {
 
         // Partial match search
         else if (key.filter === "=*") {
-          filteredData = partialMatchQuery({ data:  key.id ? queryData[key.id] : queryData, key });
+          filteredData = partialMatchQuery({
+            data: key.id ? queryData[key.id] : queryData,
+            key,
+          });
         }
 
         // Check exact match when index unavailable
         else if (key.value) {
-          filteredData = exactMatchQuery({ data: key.id ? queryData[key.id] : queryData, key });
+          filteredData = exactMatchQuery({
+            data: key.id ? queryData[key.id] : queryData,
+            key,
+          });
         }
 
         // No filter actually set, so just map the requested keys
         else {
-          filteredData = arrayQuery({ data: key.id ? queryData[key.id] : queryData, key });
+          filteredData = arrayQuery({
+            data: key.id ? queryData[key.id] : queryData,
+            key,
+          });
         }
 
         if (key.page && key.limit) {
@@ -401,20 +411,20 @@ const checkIndexExists = ({ schema, key }) => {
   if (key.id) {
     return schema[key.id] && schema[key.id].key;
   }
-    
-  return schema && schema.key
-}
 
-const partialMatchQuery = ({ data, key }) => data.filter((row) =>
-  row[key.key].includes(key.value)
-);
+  return schema && schema.key;
+};
 
-const exactMatchQuery = ({ data, key }) => data.filter(
-  // TODO: For speed, convert to for loop - 1st pass = first filter (we may have multiple passes to do here)
-  (row) => row[key.key] === key.value
-);
+const partialMatchQuery = ({ data, key }) =>
+  data.filter((row) => row[key.key].includes(key.value));
 
-const arrayQuery = ({ data, key }) => data.map((row) => ({
-  [key.key]: row[key.key],
-}));
+const exactMatchQuery = ({ data, key }) =>
+  data.filter(
+    // TODO: For speed, convert to for loop - 1st pass = first filter (we may have multiple passes to do here)
+    (row) => row[key.key] === key.value
+  );
 
+const arrayQuery = ({ data, key }) =>
+  data.map((row) => ({
+    [key.key]: row[key.key],
+  }));

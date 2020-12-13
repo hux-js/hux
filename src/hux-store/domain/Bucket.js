@@ -8,10 +8,12 @@ function Bucket({ hydrate, sync, schema, name }) {
   const { validateSchema, valid, hasKey } = compileSchema({ schema });
 
   if (!valid) {
-    console.error(generateError({
-      type: errors.INVALID_SCHEMA,
-      details: validateSchema,
-    }));
+    console.error(
+      generateError({
+        type: errors.INVALID_SCHEMA,
+        details: validateSchema,
+      })
+    );
 
     return;
   }

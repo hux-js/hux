@@ -1,7 +1,6 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import bundleSize from 'rollup-plugin-bundle-size';
-import brotli from "rollup-plugin-brotli";
 import typescript from 'rollup-plugin-typescript2';
 
 export default [
@@ -40,8 +39,8 @@ export default [
     plugins: [
       nodeResolve(),
       bundleSize(),
-      brotli(),
       typescript(),
+      terser()
     ],
   },
 ];

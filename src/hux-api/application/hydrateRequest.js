@@ -5,7 +5,7 @@ import {
   listenToBucket,
 } from "../../hux-store";
 
-const hydrateServerRequest = async ({ request, query }) => {
+const hydrateServerRequest = async ({ request, query, eventId }) => {
   const worker = await createWorker();
 
   await worker.dispatcher(JSON.stringify(request));
@@ -13,6 +13,7 @@ const hydrateServerRequest = async ({ request, query }) => {
   const queryResponse = await queryBucket({
     name: request.name,
     query: query || [],
+    eventId,
   });
 
   const response = {
@@ -32,6 +33,7 @@ const hydrateRequest = async ({
   name,
   hasKey,
   onUpdate,
+  eventId,
 }) => {
   let response;
 
@@ -53,6 +55,7 @@ const hydrateRequest = async ({
     const cachedQueryResponse = await queryBucket({
       name,
       query,
+      eventId,
     });
 
     if (cachedQueryResponse) {
@@ -66,6 +69,7 @@ const hydrateRequest = async ({
         const queryResponse = await hydrateServerRequest({
           request,
           query,
+          eventId,
         });
 
         triggerListeners({ name, data: queryResponse.result });
@@ -74,10 +78,11 @@ const hydrateRequest = async ({
       response = await hydrateServerRequest({
         request,
         query,
+        eventId,
       });
     }
   } else {
-    response = await hydrateServerRequest({ request });
+    response = await hydrateServerRequest({ request, eventId });
   }
 
   triggerListeners({ name, data: response.result });

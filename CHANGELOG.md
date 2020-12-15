@@ -3,7 +3,10 @@
 ## Unreleased
 
 ### 0.3.0
-...
+
+#### Added
+
+- Events now linked by an id so the profiler can group events together (#6)
 
 ---
 

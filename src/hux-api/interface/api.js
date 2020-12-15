@@ -38,7 +38,7 @@ const hydrate = async ({ name, query, aggregations = [], onUpdate }) => {
 
   if (PROFILER_ENABLED()) {
     response = await measurePerformance({
-      fn: async () => await hydrateRequest(params),
+      fn: async ({ eventId }) => await hydrateRequest({ ...params, eventId }),
       type: WorkerEvent.HYDRATE,
       details: { url, options, bucketName: name },
     });

@@ -3,7 +3,7 @@ version: 2.1
 
 aliases:
   - &docker
-    - image: circleci/openjdk:8-jdk-node-browsers
+    - image: node:12
 
 jobs:
   test:

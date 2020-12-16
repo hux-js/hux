@@ -7,6 +7,7 @@ aliases:
 
 jobs:
   test:
+    docker: *docker
     steps:
       - attach_workspace:
           at: .
@@ -16,6 +17,7 @@ jobs:
           command: npm run test:lint && npm run test:jest
 
   install:
+    docker: *docker
     steps:
       - checkout
       - run:

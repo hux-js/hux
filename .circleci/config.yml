@@ -1,0 +1,41 @@
+---
+version: 2.1
+
+jobs:
+  test:
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - run:
+          name: Run tests
+          command: npm run test:lint && npm run test:jest
+
+  install:
+    steps:
+      - checkout
+      - run:
+          name: Install npm deps
+          command: npm ci
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+workflows:
+  version: 2.1
+
+  develop:
+    jobs:
+      - install:
+          filters:
+            branches:
+              only:
+                - develop
+      - test:
+          requires:
+            - install
+          filters:
+            branches:
+              only:
+                - develop

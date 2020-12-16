@@ -9,7 +9,13 @@ import { getBucketsMemorySizeRequest } from "../application/getBucketsMemorySize
 import { initialiseBucketCommand } from "../application/initialiseBucketCommand";
 import { generateError, errors } from "../../utils/errors";
 
-const queryBucket = async ({ name, query, onUpdate, fromProfiler, eventId }) => {
+const queryBucket = async ({
+  name,
+  query,
+  onUpdate,
+  fromProfiler,
+  eventId,
+}) => {
   if (!name || !query) {
     console.error(
       generateError({

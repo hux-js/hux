@@ -22,7 +22,7 @@ const memorySizeOf = (obj) => {
           var objClass = Object.prototype.toString.call(obj).slice(8, -1);
           if (objClass === "Object" || objClass === "Array") {
             for (var key in obj) {
-              if (!obj.hasOwnProperty(key)) continue;
+              if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
               sizeOf(obj[key]);
             }
           } else bytes += obj.toString().length * 2;
@@ -63,7 +63,7 @@ const updateCache = async ({ name, bucket }) => {
 };
 
 const fetchFromCache = ({ name }) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let huxDb = indexedDB.open(CORE_DB, 1);
 
     huxDb.onerror = function () {
@@ -365,8 +365,7 @@ const sync = async ({ name, data, mode, url, options }) => {
       buckets[name] = { ...bucket, data };
       break;
     case "merge":
-      const mergedData = merge(data, bucket.data);
-      buckets[name] = { ...bucket, data: mergedData };
+      buckets[name] = { ...bucket, data: merge(data, bucket.data) };
       break;
     default:
       buckets[name] = { ...bucket, data };

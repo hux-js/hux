@@ -2,6 +2,7 @@ import * as Comlink from "comlink";
 
 import workerString from "../../../dist/worker.bundle.umd";
 import { WorkerEventType } from "../domain/WorkerEvent";
+import { memorySizeOf } from "../utils/worker";
 
 let proxy;
 
@@ -18,4 +19,6 @@ const createWorker = async () => {
 
 const WorkerEvent = WorkerEventType;
 
-export { createWorker, WorkerEvent };
+const getSizeOfMemory = memorySizeOf;
+
+export { createWorker, WorkerEvent, getSizeOfMemory };

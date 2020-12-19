@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-const sizeof = require("object-sizeof");
+import { getSizeOfMemory } from "../../hux-workers";
 
 const measureRequestPerformance = async ({ details, fn, type, eventId }) => {
   const id = eventId || uuidv4();
@@ -21,7 +21,7 @@ const measureRequestPerformance = async ({ details, fn, type, eventId }) => {
   const { result, metrics } = await fn({ eventId: id });
   const end = performance.now();
 
-  const resultMemorySize = sizeof(result);
+  const resultMemorySize = getSizeOfMemory(result);
   const date = new Date();
 
   window.__HUX_PROFILER_EVENTS__.events[id][subEventId] = {

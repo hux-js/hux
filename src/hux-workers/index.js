@@ -1,3 +1,3 @@
-import { createWorker, WorkerEvent } from "./interface/worker";
+import { createWorker, WorkerEvent, getSizeOfMemory } from "./interface/worker";
 
-export { createWorker, WorkerEvent };
+export { createWorker, WorkerEvent, getSizeOfMemory };

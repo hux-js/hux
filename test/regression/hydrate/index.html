@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hydrate regression test</title>
+  </head>
+  <body>
+    <div id="render-to" />
+
+    <script type="module">
+      import { hydrate, Bucket } from '../../../dist/bundle.umd';
+
+      Bucket({
+        name: 'Test',
+        hydrate: {
+          url: 'http://mock-url'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            testProp: {
+              type: 'string'
+            }
+          }
+        }
+      });
+
+      const hydrateTest = async () => {
+        const { testProp } = await hydrate({
+          name: 'Test',
+          query: ['testProp']
+        });
+
+        console.log('testProp', testProp)
+
+        document.getElementById('render-to').innerText(testProp);
+      };
+
+      hydrateTest();
+    </script>
+  </body>
+</html>

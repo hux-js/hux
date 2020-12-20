@@ -1,6 +1,11 @@
 ---
 version: 2.1
 
+develop_only: &develop_only
+  filters:
+    branches:
+      only: develop
+
 aliases:
   - &docker
     - image: node:12
@@ -14,7 +19,7 @@ jobs:
       - checkout
       - run:
           name: Run tests
-          command: npm run test:lint && npm run test:jest
+          command: npm run test
 
   install:
     docker: *docker
@@ -28,20 +33,33 @@ jobs:
           paths:
             - .
 
+  build:
+    docker: *docker
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - run:
+          name: Build app
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
 workflows:
   version: 2.1
 
   develop:
     jobs:
       - install:
-          filters:
-            branches:
-              only:
-                - develop
+          <<: *develop_only
+      - build:
+          requires:
+            - install
+          <<: *develop_only
       - test:
           requires:
             - install
-          filters:
-            branches:
-              only:
-                - develop
+            - build
+          <<: *develop_only

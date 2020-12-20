@@ -1,7 +1,6 @@
 import { chromium, webkit, firefox } from 'playwright';
 
-// const browserName = process.env.BROWSER || 'webkit';
-const browserName = 'chromium';
+const browserName = process.env.BROWSER || 'webkit';
 
 let browser;
 let page;

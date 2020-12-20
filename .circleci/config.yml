@@ -8,7 +8,9 @@ develop_only: &develop_only
 
 aliases:
   - &docker
-    - image: node:12
+    - image: mcr.microsoft.com/playwright:bionic
+      environment:
+        NODE_ENV: development
 
 jobs:
   test:

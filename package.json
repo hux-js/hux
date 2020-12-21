@@ -6,14 +6,14 @@
   "unpkg": "dist/bundle.umd.min.js",
   "scripts": {
     "test": "npm run test:lint && npm run test:unit && npm run test:regression",
-    "test:lint": "eslint src/",
+    "test:lint": "eslint --fix '{src,test}/**/*.js'",
     "test:unit": "jest --config jest.config.js",
-    "test:regression": "jest --config test/regression/__config__/jest.config.js",
+    "test:regression": "./scripts/run-regression-tests.sh",
     "test:regression:verbose": "DEBUG=pw:api jest --config test/regression/__config__/jest.config.js",
     "package": "rollup -c",
     "package-watch": "rollup -c --watch",
     "build": "npm run package",
-    "prettier": "prettier --write src/"
+    "prettier": "prettier --write '{src,test}/**/*.{js,html}'"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -27,6 +27,7 @@
     "husky": "^4.3.6",
     "jest": "^26.6.3",
     "jest-dev-server": "^4.4.0",
+    "lint-staged": "^10.5.3",
     "playwright": "^1.7.0",
     "prettier": "^2.2.0",
     "rollup": "^2.33.1",
@@ -37,9 +38,16 @@
     "tslib": "^2.0.3",
     "typescript": "^4.1.3"
   },
+  "lint-staged": {
+    "{src,test}/**/*.js": [
+        "npm run test:lint",
+        "npm run prettier",
+        "git add"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run test:lint",
+      "pre-commit": "lint-staged",
       "pre-push": "npm run test:unit"
     }
   },

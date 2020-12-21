@@ -9,11 +9,11 @@ const compileSchema = ({ schema }) => {
 };
 
 const Filter = (id, filter, page, limit) => {
-  if (!id || !filter) {
+  if (!filter) {
     console.error(
       generateError({
         type: errors.MISSING_REQUIRED_PARAM,
-        details: { param: "id or filter", action: "Filter" },
+        details: { param: "filter", action: "Filter" },
       })
     );
 

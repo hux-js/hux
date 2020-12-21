@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Query regression test</title>
+  </head>
+  <body>
+    <div id="render-to"></div>
+
+    <button id="query-button" onclick="queryTest()">Query</button>
+    <button id="query-filter-button" onclick="queryFilterTest()">
+      Query with filter
+    </button>
+    <button id="query-array-button" onclick="queryArrayTest()">
+      Query array
+    </button>
+    <button id="query-array-filter-button" onclick="queryArrayFilterTest()">
+      Query array with filter
+    </button>
+
+    <script src="../scripts/bundle.umd.js"></script>
+    <script>
+      const { hydrate, Bucket, query, Filter } = hux;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const profilerEnabled = urlParams.get("profilerEnabled");
+
+      if (profilerEnabled === "true") {
+        window.__HUX_PROFILER_ENABLED__ = true;
+      }
+
+      // Set up buckets
+      // =============================
+
+      Bucket({
+        name: "Users",
+        hydrate: {
+          url: "http://localhost:8128/api/hydrate",
+        },
+        schema: {
+          type: "object",
+          properties: {
+            userCount: { type: "string" },
+            users: {
+              type: "array",
+              key: "name",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                },
+              },
+            },
+            meta: {
+              type: "object",
+              properties: {
+                selected: {
+                  type: "boolean",
+                },
+                images: {
+                  type: "array",
+                  key: "src",
+                  items: {
+                    type: "object",
+                    properties: {
+                      src: { type: "string" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      Bucket({
+        name: "UsersArray",
+        hydrate: {
+          url: "http://localhost:8128/api/hydrate-users-array",
+        },
+        schema: {
+          type: "array",
+        },
+      });
+
+      // Hydrate buckets
+      // =============================
+
+      hydrate({
+        name: "Users",
+      });
+
+      hydrate({
+        name: "UsersArray",
+      });
+
+      // Set up each query case
+      // =============================
+
+      const queryTest = async () => {
+        const {
+          userCount,
+          meta: { selected },
+        } = await query({
+          name: "Users",
+          query: ["userCount", ["meta", ["selected"]]],
+        });
+
+        document.getElementById(
+          "render-to"
+        ).innerText = `${userCount} - ${selected}`;
+      };
+
+      const queryFilterTest = async () => {
+        const {
+          users,
+          meta: { images, selected },
+        } = await query({
+          name: "Users",
+          query: [
+            ["meta", [Filter("images", ["src=/mock-image.jpg"]), "selected"]],
+            Filter("users", ["name=Mock name 1"]),
+          ],
+        });
+
+        document.getElementById("render-to").innerText = JSON.stringify({
+          users,
+          images,
+          selected,
+        });
+      };
+
+      const queryArrayTest = async () => {
+        const usersArray = await query({
+          name: "UsersArray",
+          query: [],
+        });
+
+        document.getElementById("render-to").innerText = JSON.stringify(
+          usersArray
+        );
+      };
+
+      const queryArrayFilterTest = async () => {
+        const users = await query({
+          name: "UsersArray",
+          query: [Filter(null, ["name=Mock name 1"])],
+        });
+
+        document.getElementById("render-to").innerText = JSON.stringify(users);
+      };
+    </script>
+  </body>
+</html>

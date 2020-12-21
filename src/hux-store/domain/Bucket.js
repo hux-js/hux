@@ -5,7 +5,9 @@ import { generateError, errors } from "../../utils/errors";
 import { initialiseBucket } from "../";
 
 function Bucket({ hydrate, sync, schema, name }) {
-  const { validateSchema, valid, hasKey, validationError } = compileSchema({ schema });
+  const { validateSchema, valid, hasKey, validationError } = compileSchema({
+    schema,
+  });
 
   if (!valid) {
     console.error(
@@ -13,9 +15,9 @@ function Bucket({ hydrate, sync, schema, name }) {
         type: errors.INVALID_SCHEMA,
         details: {
           bucket: name,
-          action: 'Initialise bucket',
+          action: "Initialise bucket",
           validationError,
-        }
+        },
       })
     );
 

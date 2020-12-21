@@ -40,10 +40,13 @@ export default [
     plugins: [
       nodeResolve(),
       commonjs({
-        include: ['src/**', 'node_modules/**'],
+        transformMixedEsModules: true,
+        include: ['src/**', 'node_modules/**']
       }),
       typescript(),
-      json()
+      json(),
+      babel(),
+      terser()
     ],
   },
   {

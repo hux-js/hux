@@ -1,37 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Hydrate regression test</title>
   </head>
   <body>
     <div id="render-to"></div>
+
     <button id="hydrate-button" onclick="hydrateTest()">Hydrate</button>
+    <button id="hydrate-onUpdate-button" onclick="hydrateOnUpdateTest()">
+      Hydrate onUpdate
+    </button>
 
     <script src="../scripts/bundle.umd.js"></script>
     <script>
       const { hydrate, Bucket } = hux;
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const profilerEnabled = urlParams.get("profilerEnabled");
+
+      console.log("profilerEnabled", profilerEnabled);
+
+      if (profilerEnabled === "true") {
+        window.__HUX_PROFILER_ENABLED__ = true;
+      }
+
       Bucket({
-        name: 'Test',
+        name: "Users",
         hydrate: {
-          url: 'http://localhost:8128/api/hydrate'
+          url: "http://localhost:8128/api/hydrate",
         },
         schema: {
-          type: 'object',
+          type: "object",
           properties: {
-            testProp: { type: 'string' }
-          }
-        }
+            userCount: { type: "string" },
+          },
+        },
       });
 
       const hydrateTest = async () => {
-        const { testProp } = await hydrate({
-          name: 'Test',
-          query: ['testProp']
+        const { userCount } = await hydrate({
+          name: "Users",
+          query: ["userCount"],
         });
 
-        document.getElementById('render-to').innerText = testProp;
+        document.getElementById("render-to").innerText = userCount;
+      };
+
+      const hydrateOnUpdateTest = async () => {
+        const { userCount } = await hydrate({
+          name: "Users",
+          query: ["userCount"],
+          onUpdate: ({ userCount }) => {
+            document.getElementById(
+              "render-to"
+            ).innerText = `onUpdate-${userCount}`;
+          },
+        });
+
+        document.getElementById("render-to").innerText = userCount;
       };
     </script>
   </body>

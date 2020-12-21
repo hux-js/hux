@@ -114,33 +114,39 @@ const optimise = ({ data, schema, hasKey }) => {
   if (hasKey) {
     const recursiveSelector = ({ subData, subSchema }) => {
       const schemaKeys = Object.keys(subSchema);
-      let keyFound = false;
 
       // Beware of complexity here, how can we improve this?
       for (let i = 0; i < schemaKeys.length; i++) {
+        let currentSubSchema;
         const key = schemaKeys[i];
-        const isProperty = key === "properties";
-        const value = subSchema.key ? subSchema : subSchema[key];
-        const currentSubData =
-          isProperty || subSchema.key ? subData : subData[key];
+        const isProperty = key === "properties" || key === "items";
+        const hasProperties = subSchema[key].properties || subSchema[key].items;
 
-        if (value.key && !keyFound) {
+        if (isProperty) {
+          currentSubSchema =
+            key === "properties"
+              ? subSchema.properties
+              : subSchema.items.properties;
+        } else {
+          currentSubSchema = subSchema[key];
+        }
+
+        const currentSubData = isProperty ? subData : subData[key];
+
+        if (key === "key") {
           indexes[incrementer] = {};
+          subSchema.index = incrementer;
 
-          if (subSchema.key) {
-            subSchema.index = incrementer;
-          } else {
-            subSchema[key].index = incrementer;
+          for (let i = 0; i < subData.length; i++) {
+            indexes[incrementer][subData[i][subSchema.key].toString()] = i;
           }
 
-          for (let i = 0; i < currentSubData.length; i++) {
-            indexes[incrementer][currentSubData[i][value.key]] = i;
-          }
-
-          keyFound = true;
           incrementer++;
-        } else if (isProperty) {
-          recursiveSelector({ subData: currentSubData, subSchema: value });
+        } else if (isProperty || hasProperties) {
+          recursiveSelector({
+            subData: currentSubData,
+            subSchema: currentSubSchema,
+          });
         }
       }
     };
@@ -190,6 +196,10 @@ const query = async ({ query, name }) => {
           subSchema:
             subSchema[key[0]] && subSchema[key[0]].properties
               ? subSchema[key[0]].properties
+              : subSchema[key[0]] &&
+                subSchema[key[0]].items &&
+                subSchema[key[0]].items.properties
+              ? subSchema[key[0]].items.properties
               : null,
         });
       } else if (key.type && key.type === "filter") {
@@ -255,7 +265,11 @@ const query = async ({ query, name }) => {
   const result = recursiveSelector({
     query,
     queryData: data,
-    subSchema: schema.properties ? schema.properties : schema,
+    subSchema: schema.properties
+      ? schema.properties
+      : schema.items && schema.items.properties
+      ? schema.items.properties
+      : schema,
   });
   const end = performance.now();
 

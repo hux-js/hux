@@ -1,4 +1,4 @@
-import Ajv from 'ajv';
+import Ajv from "ajv";
 
 const compileAjvSchema = ({ schema }) => {
   const ajv = Ajv();

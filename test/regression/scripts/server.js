@@ -8,15 +8,13 @@ const { users, userCount, meta } = require("../__mocks__/users");
 const server = http.createServer((request, response) => {
   if (request.url == "/api/hydrate") {
     response.end(JSON.stringify({ users, userCount, meta }));
-  }
-
-  if (request.url == "/api/hydrate-users-array") {
+  } else if (request.url == "/api/hydrate-users-array") {
     response.end(JSON.stringify(users));
+  } else {
+    return handler(request, response, {
+      public: WS_BUILD,
+    });
   }
-
-  return handler(request, response, {
-    public: WS_BUILD,
-  });
 });
 
 server.listen(8128);

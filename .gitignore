@@ -5,3 +5,5 @@ dist/
 .DS_Store
 
 hux-js-hux-*.tgz
+
+test/regression/scripts/bundle.umd.js

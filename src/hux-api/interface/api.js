@@ -70,7 +70,7 @@ const sync = async ({ name, mode, data, fromProfiler }) => {
     console.error(
       generateError({
         type: errors.INVALID_SCHEMA,
-        details: { bucket: name, action: "sync" },
+        details: { bucket: name, action: "sync", validationError: null },
       })
     );
 

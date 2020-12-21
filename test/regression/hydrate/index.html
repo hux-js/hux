@@ -5,25 +5,12 @@
     <title>Hydrate regression test</title>
   </head>
   <body>
-    <div id="render-to" />
+    <div id="render-to"></div>
+    <button id="hydrate-button" onclick="hydrateTest()">Hydrate</button>
 
-    <script type="module">
-      import { hydrate, Bucket } from '../../../dist/bundle.umd';
-
-      Bucket({
-        name: 'Test',
-        hydrate: {
-          url: 'http://mock-url'
-        },
-        schema: {
-          type: 'object',
-          properties: {
-            testProp: {
-              type: 'string'
-            }
-          }
-        }
-      });
+    <script src="../scripts/bundle.umd.js"></script>
+    <script>
+      const { hydrate, Bucket } = huxRegression;
 
       const hydrateTest = async () => {
         const { testProp } = await hydrate({
@@ -31,12 +18,21 @@
           query: ['testProp']
         });
 
-        console.log('testProp', testProp)
-
-        document.getElementById('render-to').innerText(testProp);
+        document.getElementById('render-to').innerText = testProp;
       };
-
-      hydrateTest();
+    
+      Bucket({
+        name: 'Test',
+        hydrate: {
+          url: 'http://localhost:8128/api/hydrate'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            testProp: { type: 'string' }
+          }
+        }
+      });
     </script>
   </body>
 </html>

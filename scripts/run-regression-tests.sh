@@ -1,4 +1,6 @@
-#!/bin/bash -eo pipefail
+#!/bin/bash
+
+set -eo pipefail
 
 echo 'Running tests in firefox...';
 BROWSER=firefox jest --config test/regression/__config__/jest.config.js;

@@ -43,7 +43,8 @@ const hydrate = async ({ name, query, aggregations = [], onUpdate }) => {
       details: { url, options, bucketName: name },
     });
   } else {
-    response = await hydrateRequest(params);
+    const { result } = await hydrateRequest(params);
+    response = result;
   }
 
   return query ? response : null;

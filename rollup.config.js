@@ -51,11 +51,14 @@ export default [
     output: {
       file: 'test/regression/scripts/bundle.umd.js',
       format: 'umd',
-      name: 'huxRegression',
+      name: 'hux',
     },
     plugins: [
       nodeResolve({ browser: true }),
-      commonjs(),
+      commonjs({
+        transformMixedEsModules: true,
+        include: ['src/**', 'node_modules/**']
+      }),
       typescript(),
       json(),
       babel()

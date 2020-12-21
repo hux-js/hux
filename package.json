@@ -9,6 +9,7 @@
     "test:lint": "eslint src/",
     "test:unit": "jest --config jest.config.js",
     "test:regression": "jest --config test/regression/__config__/jest.config.js",
+    "test:regression:verbose": "DEBUG=pw:api jest --config test/regression/__config__/jest.config.js",
     "package": "rollup -c",
     "package-watch": "rollup -c --watch",
     "build": "npm run package",
@@ -56,7 +57,7 @@
     "hux"
   ],
   "dependencies": {
-    "ajv": "^7.0.2",
+    "ajv": "^6.12.6",
     "comlink": "^4.3.0",
     "lodash-es": "^4.17.15",
     "uuid": "^8.3.1"

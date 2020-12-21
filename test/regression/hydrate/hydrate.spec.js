@@ -16,11 +16,9 @@ afterAll(async () => {
 beforeEach(async () => {
   page = await browser.newPage();
 
-  page.on('console', msg => console.log(msg.text()))
-
-  await page.route('**/api/hydrate', route => route.fulfill({
+  await page.route('http://localhost:8128/api/hydrate', route => route.fulfill({
     status: 200,
-    body: { testProp: 'mock' },
+    body: JSON.stringify({ testProp: 'mock' }),
   }));
 
   await page.goto('http://localhost:8128/hydrate');
@@ -34,9 +32,9 @@ it('should load test file correctly', async () => {
   expect(await page.title()).toBe('Hydrate regression test');
 });
 
-xit('should load the hydrated data correctly', async () => {
-  const [response] = await Promise.all([
-    page.waitForResponse('**/api/hydrate'),
+it('should load the hydrated data correctly', async () => {
+  await Promise.all([
+    page.waitForResponse('http://localhost:8128/api/hydrate'),
     page.click('button#hydrate-button'),
   ]);
 

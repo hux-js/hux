@@ -10,17 +10,8 @@
 
     <script src="../scripts/bundle.umd.js"></script>
     <script>
-      const { hydrate, Bucket } = huxRegression;
+      const { hydrate, Bucket } = hux;
 
-      const hydrateTest = async () => {
-        const { testProp } = await hydrate({
-          name: 'Test',
-          query: ['testProp']
-        });
-
-        document.getElementById('render-to').innerText = testProp;
-      };
-    
       Bucket({
         name: 'Test',
         hydrate: {
@@ -33,6 +24,15 @@
           }
         }
       });
+
+      const hydrateTest = async () => {
+        const { testProp } = await hydrate({
+          name: 'Test',
+          query: ['testProp']
+        });
+
+        document.getElementById('render-to').innerText = testProp;
+      };
     </script>
   </body>
 </html>

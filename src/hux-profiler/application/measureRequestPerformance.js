@@ -1,20 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 import { getSizeOfMemory } from "../../hux-workers";
+import { Store } from "../../hux-store";
 
 const measureRequestPerformance = async ({ details, fn, type, eventId }) => {
   const id = eventId || uuidv4();
   const subEventId = uuidv4();
 
-  if (!window.__HUX_PROFILER_EVENTS__.events) {
-    window.__HUX_PROFILER_EVENTS__.events = {};
-  }
-
-  window.__HUX_PROFILER_EVENTS__.events = {
-    ...window.__HUX_PROFILER_EVENTS__.events,
-    [id]: {
-      ...(window.__HUX_PROFILER_EVENTS__.events[id] || {}),
-      [subEventId]: {},
-    },
+  Store.profiler.events[id] = {
+    ...(Store.profiler.events[id] || {}),
+    [subEventId]: {},
   };
 
   const start = performance.now();
@@ -24,7 +18,7 @@ const measureRequestPerformance = async ({ details, fn, type, eventId }) => {
   const resultMemorySize = getSizeOfMemory(result);
   const date = new Date();
 
-  window.__HUX_PROFILER_EVENTS__.events[id][subEventId] = {
+  Store.profiler.events[id][subEventId] = {
     type,
     details: {
       ...details,
@@ -37,6 +31,11 @@ const measureRequestPerformance = async ({ details, fn, type, eventId }) => {
     memorySize: resultMemorySize,
     eventTime: date.toUTCString(),
   };
+
+  // End of the parent event so now we can update the profiler
+  if (!eventId && Store.profiler.handlers.updateEvents) {
+    Store.profiler.handlers.updateEvents({ events: Store.profiler.events });
+  }
 
   return result;
 };

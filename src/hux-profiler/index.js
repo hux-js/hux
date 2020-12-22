@@ -1,3 +1,3 @@
-import { measurePerformance } from "./interface/profiler";
+import { measurePerformance, profilerInteropHook } from "./interface/profiler";
 
-export { measurePerformance };
+export { measurePerformance, profilerInteropHook };

@@ -1,6 +1,9 @@
 let StoreType = {
   buckets: {},
-  events: {},
+  profiler: {
+    events: {},
+    handlers: {},
+  },
   metrics: {
     memoryUsage: [],
   },

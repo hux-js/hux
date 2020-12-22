@@ -7,7 +7,7 @@
 <h1 align="center"><a href="https://huxjs.org" target="_blank" rel="noopener noreferrer">Hux</a></h1>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@hux-js/hux"><img src="https://img.shields.io/badge/npm-v0.1.0-blue" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/@hux-js/hux"><img src="https://img.shields.io/badge/npm-v0.3.0-blue" alt="Version"></a>
   <a href="https://www.npmjs.com/package/@hux-js/hux"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
 </p>
 

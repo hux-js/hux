@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 0.4.0
+
+#### Added
+
+- Add profiler hook to interop updates instantly between hux & hux profiler (#16)
+
+---
+
+## Released
+
 ### 0.3.0
 
 #### Added
@@ -12,10 +22,6 @@
 - Fixed `hydrate` response structure if profiler is not enabled
 - Changed `Filter` id to optional to allow for filtering on root arrays
 - Fixed special characters breaking `Filter`
-
----
-
-## Released
 
 ### 0.2.0
 

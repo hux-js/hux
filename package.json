@@ -1,6 +1,6 @@
 {
   "name": "@hux-js/hux",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Hyperfast data management to enable next-gen UX",
   "main": "dist/bundle.umd.min.js",
   "unpkg": "dist/bundle.umd.min.js",

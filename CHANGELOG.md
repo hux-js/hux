@@ -8,6 +8,11 @@
 
 - Events now linked by an id so the profiler can group events together (#6)
 
+#### Fixed
+- Fixed `hydrate` response structure if profiler is not enabled
+- Changed `Filter` id to optional to allow for filtering on root arrays
+- Fixed special characters breaking `Filter`
+
 ---
 
 ## Released

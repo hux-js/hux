@@ -2,3 +2,8 @@ node_modules/
 dist/
 
 .cache
+.DS_Store
+
+hux-js-hux-*.tgz
+
+test/regression/scripts/bundle.umd.js

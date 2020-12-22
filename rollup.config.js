@@ -1,6 +1,8 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import bundleSize from 'rollup-plugin-bundle-size';
+import babel from '@rollup/plugin-babel';
+import commonjs from 'rollup-plugin-commonjs';
+import json from '@rollup/plugin-json';
 import typescript from 'rollup-plugin-typescript2';
 
 export default [
@@ -26,21 +28,43 @@ export default [
           return 'export default `' + code + '`;';
         },
       },
-      typescript(),
     ],
   },
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/bundle.umd.js',
+      file: 'dist/bundle.umd.min.js',
+      format: 'umd',
+      name: 'hux'
+    },
+    plugins: [
+      nodeResolve(),
+      commonjs({
+        transformMixedEsModules: true,
+        include: ['src/**', 'node_modules/**']
+      }),
+      typescript(),
+      json(),
+      babel(),
+      terser()
+    ],
+  },
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'test/regression/scripts/bundle.umd.js',
       format: 'umd',
       name: 'hux',
     },
     plugins: [
-      nodeResolve(),
-      bundleSize(),
+      nodeResolve({ browser: true }),
+      commonjs({
+        transformMixedEsModules: true,
+        include: ['src/**', 'node_modules/**']
+      }),
       typescript(),
-      terser()
+      json(),
+      babel()
     ],
   },
 ];

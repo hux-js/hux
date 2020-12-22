@@ -2,104 +2,15 @@ import * as Comlink from "comlink";
 import { merge } from "lodash-es";
 
 import { WorkerEventType as WorkerEvent } from "../domain/WorkerEvent";
-
-const memorySizeOf = (obj) => {
-  var bytes = 0;
-
-  const sizeOf = (obj) => {
-    if (obj !== null && obj !== undefined) {
-      switch (typeof obj) {
-        case "number":
-          bytes += 8;
-          break;
-        case "string":
-          bytes += obj.length * 2;
-          break;
-        case "boolean":
-          bytes += 4;
-          break;
-        case "object":
-          var objClass = Object.prototype.toString.call(obj).slice(8, -1);
-          if (objClass === "Object" || objClass === "Array") {
-            for (var key in obj) {
-              if (!obj.hasOwnProperty(key)) continue;
-              sizeOf(obj[key]);
-            }
-          } else bytes += obj.toString().length * 2;
-          break;
-      }
-    }
-    return bytes;
-  };
-
-  const formatByteSize = (bytes) => {
-    return (bytes / 1024).toFixed(3);
-  };
-
-  return formatByteSize(sizeOf(obj));
-};
-
-const CORE_DB = "hux";
-
-const updateCache = async ({ name, bucket }) => {
-  let huxDb = indexedDB.open(CORE_DB, 1);
-
-  huxDb.onupgradeneeded = (event) => {
-    let db = event.target.result;
-    db.createObjectStore("Buckets", { keyPath: "id" });
-  };
-
-  huxDb.onsuccess = () => {
-    const db = huxDb.result;
-    const tx = db.transaction("Buckets", "readwrite");
-    const store = tx.objectStore("Buckets");
-
-    store.put({ id: name, bucket });
-
-    tx.oncomplete = () => {
-      db.close();
-    };
-  };
-};
-
-const fetchFromCache = ({ name }) => {
-  return new Promise((resolve, reject) => {
-    let huxDb = indexedDB.open(CORE_DB, 1);
-
-    huxDb.onerror = function () {
-      resolve("Not found");
-    };
-
-    huxDb.onupgradeneeded = function (event) {
-      event.target.transaction.abort();
-      resolve("Not found");
-    };
-
-    huxDb.onsuccess = () => {
-      const db = huxDb.result;
-      const tx = db.transaction("Buckets", "readwrite");
-      const store = tx.objectStore("Buckets");
-
-      const getCachedData = store.get(name);
-
-      getCachedData.onerror = function () {
-        resolve("Not found");
-      };
-
-      getCachedData.onsuccess = function () {
-        if (getCachedData.result) {
-          resolve(getCachedData.result);
-        } else {
-          resolve("Not found");
-        }
-      };
-
-      tx.oncomplete = () => {
-        db.close();
-      };
-    };
-  });
-};
+import {
+  memorySizeOf,
+  arrayQuery,
+  fetchFromCache,
+  updateCache,
+  checkIndexExists,
+  partialMatchQuery,
+  exactMatchQuery,
+} from "../utils/worker";
 
 // DATA
 // =======================
@@ -203,33 +114,39 @@ const optimise = ({ data, schema, hasKey }) => {
   if (hasKey) {
     const recursiveSelector = ({ subData, subSchema }) => {
       const schemaKeys = Object.keys(subSchema);
-      let keyFound = false;
 
       // Beware of complexity here, how can we improve this?
       for (let i = 0; i < schemaKeys.length; i++) {
+        let currentSubSchema;
         const key = schemaKeys[i];
-        const isProperty = key === "properties";
-        const value = subSchema.key ? subSchema : subSchema[key];
-        const currentSubData =
-          isProperty || subSchema.key ? subData : subData[key];
+        const isProperty = key === "properties" || key === "items";
+        const hasProperties = subSchema[key].properties || subSchema[key].items;
 
-        if (value.key && !keyFound) {
+        if (isProperty) {
+          currentSubSchema =
+            key === "properties"
+              ? subSchema.properties
+              : subSchema.items.properties;
+        } else {
+          currentSubSchema = subSchema[key];
+        }
+
+        const currentSubData = isProperty ? subData : subData[key];
+
+        if (key === "key") {
           indexes[incrementer] = {};
+          subSchema.index = incrementer;
 
-          if (subSchema.key) {
-            subSchema.index = incrementer;
-          } else {
-            subSchema[key].index = incrementer;
+          for (let i = 0; i < subData.length; i++) {
+            indexes[incrementer][subData[i][subSchema.key].toString()] = i;
           }
 
-          for (let i = 0; i < currentSubData.length; i++) {
-            indexes[incrementer][currentSubData[i][value.key]] = i;
-          }
-
-          keyFound = true;
           incrementer++;
-        } else if (isProperty) {
-          recursiveSelector({ subData: currentSubData, subSchema: value });
+        } else if (isProperty || hasProperties) {
+          recursiveSelector({
+            subData: currentSubData,
+            subSchema: currentSubSchema,
+          });
         }
       }
     };
@@ -279,6 +196,10 @@ const query = async ({ query, name }) => {
           subSchema:
             subSchema[key[0]] && subSchema[key[0]].properties
               ? subSchema[key[0]].properties
+              : subSchema[key[0]] &&
+                subSchema[key[0]].items &&
+                subSchema[key[0]].items.properties
+              ? subSchema[key[0]].items.properties
               : null,
         });
       } else if (key.type && key.type === "filter") {
@@ -344,7 +265,11 @@ const query = async ({ query, name }) => {
   const result = recursiveSelector({
     query,
     queryData: data,
-    subSchema: schema.properties ? schema.properties : schema,
+    subSchema: schema.properties
+      ? schema.properties
+      : schema.items && schema.items.properties
+      ? schema.items.properties
+      : schema,
   });
   const end = performance.now();
 
@@ -365,8 +290,7 @@ const sync = async ({ name, data, mode, url, options }) => {
       buckets[name] = { ...bucket, data };
       break;
     case "merge":
-      const mergedData = merge(data, bucket.data);
-      buckets[name] = { ...bucket, data: mergedData };
+      buckets[name] = { ...bucket, data: merge(data, bucket.data) };
       break;
     default:
       buckets[name] = { ...bucket, data };
@@ -403,28 +327,3 @@ const sync = async ({ name, data, mode, url, options }) => {
 };
 
 Comlink.expose({ dispatcher });
-
-// Utils
-// ==============
-
-const checkIndexExists = ({ schema, key }) => {
-  if (key.id) {
-    return schema[key.id] && schema[key.id].key;
-  }
-
-  return schema && schema.key;
-};
-
-const partialMatchQuery = ({ data, key }) =>
-  data.filter((row) => row[key.key].includes(key.value));
-
-const exactMatchQuery = ({ data, key }) =>
-  data.filter(
-    // TODO: For speed, convert to for loop - 1st pass = first filter (we may have multiple passes to do here)
-    (row) => row[key.key] === key.value
-  );
-
-const arrayQuery = ({ data, key }) =>
-  data.map((row) => ({
-    [key.key]: row[key.key],
-  }));

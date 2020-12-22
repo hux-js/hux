@@ -7,7 +7,7 @@ function Filter(id, filter, page, limit) {
     filter = id;
   }
 
-  const splitFilter = filter[0].split(/(\b=\*|=\b)/);
+  const splitFilter = filter[0].split(/(=\*|=)/);
 
   this.key = splitFilter[0];
   this.filter = splitFilter[1];

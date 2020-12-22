@@ -38,12 +38,13 @@ const hydrate = async ({ name, query, aggregations = [], onUpdate }) => {
 
   if (PROFILER_ENABLED()) {
     response = await measurePerformance({
-      fn: async () => await hydrateRequest(params),
+      fn: async ({ eventId }) => await hydrateRequest({ ...params, eventId }),
       type: WorkerEvent.HYDRATE,
       details: { url, options, bucketName: name },
     });
   } else {
-    response = await hydrateRequest(params);
+    const { result } = await hydrateRequest(params);
+    response = result;
   }
 
   return query ? response : null;
@@ -70,7 +71,7 @@ const sync = async ({ name, mode, data, fromProfiler }) => {
     console.error(
       generateError({
         type: errors.INVALID_SCHEMA,
-        details: { bucket: name, action: "sync" },
+        details: { bucket: name, action: "sync", validationError: null },
       })
     );
 

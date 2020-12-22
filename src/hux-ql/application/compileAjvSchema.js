@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 
 const compileAjvSchema = ({ schema }) => {
-  const ajv = new Ajv();
+  const ajv = Ajv();
   const schemaString = JSON.stringify(schema);
 
   try {

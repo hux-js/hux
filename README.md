@@ -92,7 +92,7 @@ const { users: cachedUsers } = await hydrate({
 
 ## Contributing
 
-If you'd like to contribute please read our [Code of Conduct](https://github.com/hux-js/hux/blob/develop/CODE_OF_CONDUCT.MD) & [Contributing](https://github.com/hux-js/hux/blob/develop/CONTRIBUTING.md) guides before doing so
+If you'd like to contribute please read our [Code of Conduct](https://github.com/hux-js/hux/blob/develop/CODE_OF_CONDUCT.md) & [Contributing](https://github.com/hux-js/hux/blob/develop/CONTRIBUTING.md) guides before doing so
 
 ---
 

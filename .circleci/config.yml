@@ -1,0 +1,67 @@
+---
+version: 2.1
+
+develop_only: &develop_only
+  filters:
+    branches:
+      only: develop
+
+aliases:
+  - &docker
+    - image: mcr.microsoft.com/playwright:bionic
+      environment:
+        NODE_ENV: development
+
+jobs:
+  test:
+    docker: *docker
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - run:
+          name: Run tests
+          command: npm run test
+
+  install:
+    docker: *docker
+    steps:
+      - checkout
+      - run:
+          name: Install npm deps
+          command: npm ci
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  build:
+    docker: *docker
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - run:
+          name: Build app
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+workflows:
+  version: 2.1
+
+  develop:
+    jobs:
+      - install:
+          <<: *develop_only
+      - build:
+          requires:
+            - install
+          <<: *develop_only
+      - test:
+          requires:
+            - install
+            - build
+          <<: *develop_only

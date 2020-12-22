@@ -1,27 +1,25 @@
 import { hydrateRequest } from "../hydrateRequest";
 
-import {
-  triggerListeners,
-  query,
-  listenToBucket,
-} from "../../../hux-store";
+import { triggerListeners, query, listenToBucket } from "../../../hux-store";
 
 const flushPromises = () => new Promise((resolve) => process.nextTick(resolve));
 
-jest.mock('../../../hux-workers', () => ({
-  createWorker: jest.fn().mockReturnValue(Promise.resolve({
-    dispatcher: jest.fn().mockReturnValue(Promise.resolve({}))
-  })),
+jest.mock("../../../hux-workers", () => ({
+  createWorker: jest.fn().mockReturnValue(
+    Promise.resolve({
+      dispatcher: jest.fn().mockReturnValue(Promise.resolve({})),
+    })
+  ),
   WorkerEvent: {
-    HYDRATE: 'HYDRATE'
-  }
-}))
+    HYDRATE: "HYDRATE",
+  },
+}));
 
-jest.mock('../../../hux-store', () => ({
+jest.mock("../../../hux-store", () => ({
   query: jest.fn().mockReturnValue(Promise.resolve({})),
   listenToBucket: jest.fn(),
-  triggerListeners: jest.fn()
-}))
+  triggerListeners: jest.fn(),
+}));
 
 describe("hydrateRequest", () => {
   const defaultRequest = {
@@ -46,12 +44,12 @@ describe("hydrateRequest", () => {
 
       beforeEach(async () => {
         result = await hydrateRequest(request);
-      })
+      });
 
       test("Then the listeners are triggered with the correct data", () => {
         expect(triggerListeners).toHaveBeenCalledWith({
           name: "mock-bucket",
-          data: {}
+          data: {},
         });
       });
 
@@ -62,11 +60,11 @@ describe("hydrateRequest", () => {
       test("Then the correct server response is returned", () => {
         expect(result).toEqual({
           metrics: {
-            details:  {
+            details: {
               dataFrom: "Server",
             },
           },
-          result:  {},
+          result: {},
         });
       });
     });
@@ -84,47 +82,51 @@ describe("hydrateRequest", () => {
 
       beforeEach(async () => {
         query
-          .mockReturnValueOnce(Promise.resolve({ foo: 'cached' }))
-          .mockReturnValueOnce(Promise.resolve({ foo: 'server' }))
+          .mockReturnValueOnce(Promise.resolve({ foo: "cached" }))
+          .mockReturnValueOnce(Promise.resolve({ foo: "server" }));
         result = await hydrateRequest(request);
 
         await flushPromises();
-      })
+      });
 
       test("Then the listeners are triggered with the correct data for both cache and server", () => {
         expect(triggerListeners.mock.calls).toEqual([
-          [{
-            name: "mock-bucket",
-            data: {
-              foo: 'cached'
-            }
-          }],
-          [{
-            name: "mock-bucket",
-            data: {
-              foo: 'server'
-            }
-          }]
-        ])
+          [
+            {
+              name: "mock-bucket",
+              data: {
+                foo: "cached",
+              },
+            },
+          ],
+          [
+            {
+              name: "mock-bucket",
+              data: {
+                foo: "server",
+              },
+            },
+          ],
+        ]);
       });
 
       test("Then listenToBucket is called with the correct data", () => {
         expect(listenToBucket).toHaveBeenCalledWith({
           name: "mock-bucket",
           onUpdate: request.onUpdate,
-          query: []
+          query: [],
         });
       });
 
       test("Then the correct cached response is returned", () => {
         expect(result).toEqual({
           metrics: {
-            details:  {
+            details: {
               dataFrom: "Cache",
             },
           },
-          result:  {
-            foo: 'cached'
+          result: {
+            foo: "cached",
           },
         });
       });
@@ -136,40 +138,42 @@ describe("hydrateRequest", () => {
       beforeEach(async () => {
         query
           .mockReturnValueOnce(Promise.resolve())
-          .mockReturnValueOnce(Promise.resolve({ foo: 'server' }))
+          .mockReturnValueOnce(Promise.resolve({ foo: "server" }));
         result = await hydrateRequest(request);
 
         await flushPromises();
-      })
+      });
 
       test("Then the listeners are triggered with the correct data for just server", () => {
         expect(triggerListeners.mock.calls).toEqual([
-          [{
-            name: "mock-bucket",
-            data: {
-              foo: 'server'
-            }
-          }]
-        ])
+          [
+            {
+              name: "mock-bucket",
+              data: {
+                foo: "server",
+              },
+            },
+          ],
+        ]);
       });
 
       test("Then listenToBucket is called with the correct data", () => {
         expect(listenToBucket).toHaveBeenCalledWith({
           name: "mock-bucket",
           onUpdate: request.onUpdate,
-          query: []
+          query: [],
         });
       });
 
       test("Then the correct server response is returned", () => {
         expect(result).toEqual({
           metrics: {
-            details:  {
+            details: {
               dataFrom: "Server",
             },
           },
-          result:  {
-            foo: 'server'
+          result: {
+            foo: "server",
           },
         });
       });
